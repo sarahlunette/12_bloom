@@ -1,2 +1,2 @@
 #!/bin/bash
-cron -f -L 2
+/usr/bin/cron -f -L 2

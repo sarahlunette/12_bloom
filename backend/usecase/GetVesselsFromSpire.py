@@ -101,6 +101,3 @@ class GetVesselsFromSpire:
             query_string,
         )
         return raw_vessels
-
-    def save_vessels(self, vessels: list[VesselPositionSpire]) -> None:
-        self.vessel_repository.save_spire_vessels_positions(vessels)
