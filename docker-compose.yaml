@@ -8,8 +8,9 @@ x-common-infos:
     LOGGING_LEVEL: ${LOGGING_LEVEL:-INFO}
 
 services:
-  backend:
-    container_name: bloom-backend
+  scheduler:
+    container_name: bloom-scheduler
+    hostname: bloom-scheduler
     image: d4g/bloom:${VERSION:-latest}
     build:
       context: .
@@ -18,11 +19,42 @@ services:
         IMAGE_PYTHON: ${IMAGE_PYTHON:-python:3.10-slim-bullseye}
         POETRY_VERSION: ${POETRY_VERSION:-1.8.1}
     # Nominal start:
-    #command: backend
+    command:
+        - bash
+        - -c
+        - |
+            echo "Starting Scheduler" &&
+            cron -f -L 2
     # Debug start:
-    command: bash
-    tty: true
-    stdin_open: true
+    #command: bash
+    #tty: true
+    #stdin_open: true
+    volumes:
+      - ./:/project/
+    environment:
+      <<: *common-env
+      POSTGRES_PORT: 5432
+    networks:
+      - bloom_net
+    depends_on:
+      init:
+        condition: service_completed_successfully
+  front:
+    container_name: bloom-front
+    hostname: bloom-front
+    image: d4g/bloom:${VERSION:-latest}
+    # Nominal start:
+    command:
+        - bash
+        - -c
+        - |
+            /bin/echo "Here is my frontend service" &&
+            /bin/echo "Work in progress" &&
+            /bin/echo "See you later"
+    # Debug start:
+    #command: bash
+    #tty: true
+    #stdin_open: true
     volumes:
       - ./:/project/
     environment:
@@ -36,6 +68,7 @@ services:
   
   postgres:
     container_name: postgres_bloom
+    hostname: postgres_bloom
     image: ${POSTGIS_IMAGE:-postgis/postgis:14-3.3-alpine}
     environment:
       <<: *common-env
@@ -55,8 +88,8 @@ services:
       start_period: 0s
 
   init:
-    container_name: init_bloom
-    hostname: init_bloom
+    container_name: bloom-init
+    hostname: bloom-init
     image: d4g/bloom:${VERSION:-latest}
 
     # Nominal start:
