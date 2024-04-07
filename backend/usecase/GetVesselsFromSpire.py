@@ -7,6 +7,7 @@ from logger import logger
 from gql import Client
 from gql.transport.requests import RequestsHTTPTransport
 from requests import exceptions
+from infra.database.sql_model import VesselPositionSpire
 
 
 class GetVesselsFromSpire:
@@ -100,3 +101,6 @@ class GetVesselsFromSpire:
             query_string,
         )
         return raw_vessels
+
+    def save_vessels(self, vessels: list[VesselPositionSpire]) -> None:
+        self.vessel_repository.save_spire_vessels_positions(vessels)
