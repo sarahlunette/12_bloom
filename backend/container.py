@@ -1,0 +1,70 @@
+from config import settings
+from infra.database.database_manager import Database
+from infra.repositories.repository_alert import RepositoryAlert
+from infra.repositories.repository_port import PortRepository
+from infra.repositories.repository_raster import RepositoryRaster
+from infra.repositories.repository_spire_ais_data import SpireAisDataRepository
+from infra.repositories.repository_vessel import VesselRepository
+from infra.repositories.repository_zone import ZoneRepository
+from infra.repositories.repository_excursion import ExcursionRepository
+from infra.repositories.repository_vessel_position import VesselPositionRepository
+from usecase.GenerateAlerts import GenerateAlerts
+from usecase.GetVesselsFromSpire import GetVesselsFromSpire
+from dependency_injector import containers, providers
+
+
+class UseCases(containers.DeclarativeContainer):
+    config = providers.Configuration()
+    db_url = settings.db_url
+    db = providers.Singleton(
+        Database,
+        db_url=db_url,
+    )
+
+    vessel_repository = providers.Factory(
+        VesselRepository,
+        session_factory=db.provided.session,
+    )
+
+    alert_repository = providers.Factory(
+        RepositoryAlert,
+        session_factory=db.provided.session,
+    )
+
+    raster_repository = providers.Factory(
+        RepositoryRaster,
+        session_factory=db.provided.session,
+    )
+
+    port_repository = providers.Factory(
+        PortRepository,
+        session_factory=db.provided.session,
+    )
+
+    zone_repository = providers.Factory(
+        ZoneRepository,
+        session_factory=db.provided.session,
+    )
+
+    excursion_repository = providers.Factory(
+        ExcursionRepository,
+        session_factory=db.provided.session,
+    )
+
+    vessel_position_repository = providers.Factory(
+        VesselPositionRepository,
+        session_factory=db.provided.session,
+    )
+
+    get_spire_data_usecase = providers.Factory(GetVesselsFromSpire)
+
+    generate_alert_usecase = providers.Factory(
+        GenerateAlerts,
+        alert_repository=alert_repository,
+        raster_repository=raster_repository,
+    )
+
+    spire_ais_data_repository = providers.Factory(
+        SpireAisDataRepository,
+        session_factory=db.provided.session,
+    )

@@ -20,11 +20,16 @@ ARG POETRY_VERSION=1.8.1
 ENV POETRY_VERSION=${POETRY_VERSION}
 RUN pip install --user "poetry==$POETRY_VERSION"
 ENV PATH="${PATH}:/root/.local/bin"
-COPY pyproject.toml poetry.lock alembic.ini ./
+
+# Backend
+ENV PYTHONPATH=${PROJECT_DIR}/backend/
+COPY backend/pyproject.toml backend/poetry.lock backend/alembic.ini ${PROJECT_DIR}/backend/
+COPY docker/standalone docker/backend/backend /usr/local/bin/
 
 ENV PATH=/venv/bin:$PATH \
     VIRTUAL_ENV=/venv
 RUN python -m venv /venv &&\
+    cd ${PROJECT_DIR}/backend/ &&\
     poetry install
 
 # Launch cron services
@@ -39,11 +44,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install -y
 # The entrypoint.sh script stores ENV vars at runtime in the ~/.env file as key=value pairs
 # Then the cron line include some command to load these ENV vars from file before launching app.py
 # This mecanism allows to give access to the same ENV vars for app.py launch in terminal and launch via cron
-RUN echo "*/15 * * * *	root export \$(cat ~/.env | grep -v '#' | xargs);/venv/bin/python3 ${PROJECT_DIR}/app.py 2>&1 | /usr/bin/logger -t bloom"  >> ./cron_scrapper &&\
+RUN echo "*/15 * * * *	root export \$(cat ~/.env | grep -v '#' | xargs);/venv/bin/python3 ${PROJECT_DIR}/backend/app.py 2>&1 | /usr/bin/logger -t bloom"  >> ./cron_scrapper &&\
     chmod 744 ./cron_scrapper
 
 # Move cron tab into the right directory
-RUN	mv ./cron_scrapper /etc/cron.d/cron_scrapper
+RUN	ln -sf ${PROJECT_DIR}/cron_scrapper /etc/cron.d/cron_scrapper
 
 # Run file
 RUN	crontab /etc/cron.d/cron_scrapper

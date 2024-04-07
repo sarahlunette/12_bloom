@@ -1,6 +1,6 @@
 # Liste et description des traitements batch
 
-Liste et description des traitements disponibles dans le répertoire `src/bloom/tasks/`:
+Liste et description des traitements disponibles dans le répertoire `src/backend/tasks/`:
 
 * `load_spire_data_from_api.py`: Appel l'API Spire et enregistre les données AIS recueillies dans la
   table `spire_ais_data`

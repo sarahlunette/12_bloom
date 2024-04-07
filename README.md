@@ -156,10 +156,10 @@ password, database name, port to use)
     # * data/spire_positions_subset.csv
     # * data/vessels_subset.csv
     # * data/zones_subset.csv
-    $ python3 src/bloom/tasks/load_dim_vessel_from_csv.py 
-    $ python3 src/bloom/tasks/load_dim_port_from_csv.py
-    $ python3 src/bloom/tasks/load_dim_zone_amp_from_csv.py
-    $ python3 src/bloom/tasks/compute_port_geometry_buffer.py
+    $ python3 tasks/load_dim_vessel_from_csv.py 
+    $ python3 tasks/load_dim_port_from_csv.py
+    $ python3 tasks/load_dim_zone_amp_from_csv.py
+    $ python3 tasks/compute_port_geometry_buffer.py
 ```
 
 #### Starting the application
@@ -168,7 +168,7 @@ password, database name, port to use)
     # Enable virtual poetry project environment
     poetry shell
     # Start streamlit application
-    streamlit run src/Trawlwatcher.py
+    streamlit run front_streamlit/Trawlwatcher.py
 ```
 
 You can now jump to [Use the Bloom Application](#use-the-bloom-application)
@@ -188,16 +188,16 @@ $ alembic upgrade head
   to `spire_ais_data`). This may take long if you have a long positions history:
 
 ```
-$ python src/bloom/tasks/convert_spire_vessels_to_spire_ais_data.py
+$ python tasks/convert_spire_vessels_to_spire_ais_data.py
 ```
 
 - Load new references data (AMP zone, ports, vessels):
 
 ```
-$ /venv/bin/python3 src/bloom/tasks/load_dim_vessel_from_csv.py 
-$ /venv/bin/python3 src/bloom/tasks/load_dim_port_from_csv.py
-$ /venv/bin/python3 src/bloom/tasks/load_dim_zone_amp_from_csv.py
-$ /venv/bin/python3 src/bloom/tasks/compute_port_geometry_buffer.py
+$ /venv/bin/python3 tasks/load_dim_vessel_from_csv.py 
+$ /venv/bin/python3 tasks/load_dim_port_from_csv.py
+$ /venv/bin/python3 tasks/load_dim_zone_amp_from_csv.py
+$ /venv/bin/python3 tasks/compute_port_geometry_buffer.py
 ```
 
 - If you feel it, drop old tables:

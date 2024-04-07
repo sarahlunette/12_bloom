@@ -4,9 +4,9 @@
 
 ## Data models
 
-- SQL Alchemy is used to map infra [SQL models](see [infra/database](../../src/bloom/infra/database/))
+- SQL Alchemy is used to map infra [SQL models](see [infra/database](../../src/backend/infra/database/))
 - A mapping is done to map infra models with domain
-- For the front-end application pydantic is used (see [domain](../../src/bloom/domain/))
+- For the front-end application pydantic is used (see [domain](../../src/backend/domain/))
 
 ## Worflows
 
