@@ -30,3 +30,6 @@ if st.button('Start labelling'):
     #check record is not in the csv
     #change figure (fig facile de changer)
     #st.session_state = False (unclick button to check)
+
+  # ou utiliser st.button("Submit", on_click=display_text), display_text is a function
+
