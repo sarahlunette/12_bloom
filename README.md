@@ -1,27 +1,18 @@
-![banner](src/images/banner.png)
+![banner](docs/images/banner.png)
 
 ## What is Trawl Watch
 
-**[Trawl Watch](https://twitter.com/TrawlWatch)** is an initiative launched by the *
-*[Bloom Association](https://www.bloomassociation.org/en/)** to track and expose the most destructive fishing vessels.
-Inspired by L’[Avion de Bernard](https://www.instagram.com/laviondebernard/), which monitors the movements of private
-jets, **Trawl Watch** aims to make visible the impact of these massive trawlers on our oceans. These vessels, often
-referred to as _mégachalutiers_, deploy gigantic nets that can engulf marine life from the surface down to the ocean
-floor. The consequences are both ecological—as they devastate crucial nursery and breeding areas for marine animals—and
-social, as they deprive artisanal fishermen of a healthy marine ecosystem. The solution proposed by **Bloom** is to
-dismantle these industrial fishing ships and redistribute their quotas to small-scale fishers. A petition has been
-launched, and **Bloom** continues to track these megatrawlers while awaiting action from European institutions.
-
-**Did you know that, in Europe, the largest fishing vessels, which represent 1% of the fleet, catch half of the fish?**
-These factory-vessels can measure up to 144 meters in length and catch 400,000 kilos of fish per day! This is as much as
-1,000 small-scale fishing vessels in one day at sea.
+**[Trawl Watch](https://twitter.com/TrawlWatch)** is an initiative launched by
+**[BLOOM Association](https://www.bloomassociation.org/en/)** to track and expose the most destructive EU fishing vessels.
+Inspired by l’[Avion de Bernard](https://www.instagram.com/laviondebernard/), which monitors the movements of private
+jets, **Trawl Watch** aims to make visible the impact of the fishing vessels, mostly trawlers or senners on our oceans.
 
 **These veritable sea monsters are devastating Europe’s biodiversity and coastlines.** It is important to measure the
 scale of the damage: about 20 of these factory-vessels can obliterate hundreds of thousands of marine animals and
 biodiversity treasures in one day, including in the so-called ‘Marine Protected Areas’ of French territorial waters,
 which are not protected at all.
 
-## What is Bloom Association
+## What is BLOOM Association
 
 **BLOOM** is a non-profit organization founded in 2005 that works to preserve the marine environment and species from
 unnecessary destruction and to increase social benefits in the fishing sector. **BLOOM** wages awareness and advocacy
@@ -32,47 +23,48 @@ well as policy-makers and economic stakeholders.
 
 **Table of contents**
 
-- [Principles](#principles)
 - [Requirements](#requirements)
 - [Getting started](#getting-started)
+    - [Clone repo](#clone-trawl-watch-repository)
     - [Installation with Docker/Docker Compose stack (Recommended)](#installation-with-docker-docker-compose-stack-recommended)
     - [Installation on local machine](#installation-on-local-machine)
     - [Database migration](#database-migration)
-- [Official source code](#official-source-code)
-- [Contributing](#contributing)
-- [Who uses Trawl Watch?](#who-uses-trawl-watch)
-- [Who maintains Trawl Watch?](#who-maintains-traw-watch)
-- [What goes into the next release?](#what-goes-into-the-next-release)
-- [Can I use the Trawl Watch logo in my presentation?](#can-i-use-the-trawl-watch-logo-in-my-presentation)
-- [Links](#links)
+    - [Use Trawl Watch](#use-trawl-watch)
 
-## Principles
-
-#TODO
 
 ## Requirements
 
-Bloom is tested with:
+Trawl Watch is tested with:
 
-|            | Main version (dev)   | Stable version (1.0.0) |
-|------------|----------------------|------------------------|
-| Python     | 3.8, 3.9, 3.10, 3.11 | 3.8, 3.9, 3.10, 3.11   |
-| Platform   | AMD64/ARM64(\*)      | AMD64/ARM64(\*)        |
-| Docker     | 24                   | 24                     |
-| PostgreSQL | 14                   | 14                     |
+|            | Main version (dev) | Stable version (1.0.0) |
+|------------|--------------------|------------------------|
+| Python     | 3.11               | 3.11                   |
+| Platform   | AMD64/ARM64(\*)    | AMD64/ARM64(\*)        |
+| Docker     | 24                 | 24                     |
+| PostgreSQL | 14                 | 14                     |
 
 ## Getting started
 
-### Clone the Bloom application repository
+### AIS data archives
+
+For database management, AIS "raw" data is archived. Here are the dump files:
+
+- 20230301-20240709_trawlwatch_BDD1.custom => vessel key: vessel_id (in `vessels` table)
+- 20240601-20260518_spire_ais_data.sql => vessel key: MMSI
+- 20260403-20260826_kpler_ais_data.sql => vessel key: MMSI (for now, vessel_uid will be used in further development)
+
+### Clone Trawl Watch repository
 
 ```bash
+    # clone git repository
     git clone https://github.com/dataforgoodfr/12_bloom.git
+    # change to project root directory
     cd 12_bloom
 ```
 
 ### Installation with Docker/Docker Compose stack (Recommended)
 
-#### Prerequistes
+#### Prerequisites
 
 * **Docker Engine** (version >= **18.06.0**) with **Compose** plugin
 
@@ -95,87 +87,90 @@ Bloom is tested with:
 
 To use Trawl Watch application, some data have to be initialy loaded for demonstration. As these data are protected and
 can't be publicly published, you just have to contact the Trawl Watch application team. Informations
-on [Who maintains Trawl Watch?](#who-maintains-traw-watch)
+on [Who maintains Trawl Watch?](#who-maintains-trawl-watch)
 
-After having filled 12_bloom/data folder with data files get from project team, rename files as following:
+List of required files:
+- zones.zip
+    - french_metropolitan_mpas.csv
+    - fishing_coastal_waters.csv
+    - territorial_seas.csv
+    - clipped_territorial_seas.csv
+- spire_positions_subset.csv
 
-* data/chalutiers_pelagiques.csv
-* data/spire_positions_subset.csv
-* data/vessels_subset.csv
-* data/zones_subset.csv
-* data/ports.csv
+Load all files in data folder.
 
 Then launch docker compose stack using docker compose file extension to add loading data service
 
     docker compose -f docker-compose.yaml -f docker-compose-load-data.yaml up
 
-You can now jump to [Use the Bloom Application](#use-the-bloom-application)
+You can now jump to [Use Trawl Watch](#use-trawl-watch)
 
 ### Installation on local machine
 
 #### Prerequistes
 
-* **Python**: 3.9, 3.10, 3.11
+* **Python**: 3.11
 * **Python-pip**: >=20
 * **Postgresql**: 14, 15, 16
 
 You must have a functionnal PostgreSQL instance with connexion informations (database server hostname or ip, user,
 password, database name, port to use)
 
-#### Install with Poetry
+See [development environment](./docs/notes/development.environment.md) for more information on required environment variables
+
+#### Install Backend Application with Poetry
 
 ```bash
-    # Install poetry
-    pip install --user "poetry==1.8.1"
-    # Mise à disposition de l'exécutable de manière temporaire
-    export PATH=$PATH:~/.local/bin/
-    # Ensure that poetry will create a `.venv` directory into the project with the command
-    poetry config virtualenvs.in-project true
-    # Install dependencies from pyproject.toml
-    poetry install
-    # Make sure everything is all right using
-    poetry env info
-    # Enable virtual poetry project environment
-    poetry shell
+    # From project diretory
+    cd ./backend
+    # Install uv
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    # Install project and dependencies
+    uv sync
 ```
 
 #### Initial configuration
 
 ```bash
-    # Create initial ocnfiguration
+    # From project root diretory
+    # Create initial configuration
     cp .env.template .env
     # Edit .env file
-    # Replace POSTGRES_HOSTNAME/PORT with the postgres server hostname:port (localhost if local default port server)
-    # Replace POSTGRES_USER/PASSWORD with already configured user on serverside
+```
+
+#### Loading initial data for backend
+
+```bash
+    # From project root diretory
+    cd ./backend
     # Check if database is up to date with alembic revisions
     alembic upgrade head
     # If upgrade is successful you can load the data
     # Demonstration data must be recovered from TrawlWatch Project Team
     # and put in <project>/data/ folder with correct names
-    # * data/chalutiers_pelagiques.csv
-    # * data/spire_positions_subset.csv
-    # * data/vessels_subset.csv
-    # * data/zones_subset.csv
-    $ python3 src/bloom/tasks/load_dim_vessel_from_csv.py 
-    $ python3 src/bloom/tasks/load_dim_port_from_csv.py
-    $ python3 src/bloom/tasks/load_dim_zone_amp_from_csv.py
-    $ python3 src/bloom/tasks/compute_port_geometry_buffer.py
+        - french_metropolitan_mpas.csv
+        - fishing_coastal_waters.csv
+        - territorial_seas.csv
+        - clipped_territorial_seas.csv
+        - spire_positions_subset.csv
+    $ python3 bloom/tasks/load_dim_vessel_from_csv.py
+    $ python3 bloom/tasks/load_dim_port_from_csv.py
+    $ python3 bloom/tasks/load_dim_zone_amp_from_csv.py
+    $ python3 bloom/tasks/compute_port_geometry_buffer.py
+    $ python3 bloom/tasks/load_spire_data_from_csv.py
 ```
 
 #### Starting the application
 
-```bash
-    # Enable virtual poetry project environment
-    poetry shell
-    # Start streamlit application
-    streamlit run src/Trawlwatcher.py
+```
+//TO UPDATE
 ```
 
-You can now jump to [Use the Bloom Application](#use-the-bloom-application)
+You can now jump to [Use Trawl Watch](#use-trawl-watch)
 
 ### Database migration
 
-Trawlwatch DB model has been refactored during DataForGood season 12. If you run a version of Trawlwactch using the old
+Trawl Watch DB model has been refactored during DataForGood season 12. If you run a version of Trawl Wach using the old
 model follow next steps to upgrade.
 
 - Upgrade DB model:
@@ -188,16 +183,16 @@ $ alembic upgrade head
   to `spire_ais_data`). This may take long if you have a long positions history:
 
 ```
-$ python src/bloom/tasks/convert_spire_vessels_to_spire_ais_data.py
+$ python backend/bloom/tasks/convert_spire_vessels_to_spire_ais_data.py
 ```
 
-- Load new references data (AMP zone, ports, vessels):
+- Load new references data (zones, ports, vessels):
 
 ```
-$ /venv/bin/python3 src/bloom/tasks/load_dim_vessel_from_csv.py 
-$ /venv/bin/python3 src/bloom/tasks/load_dim_port_from_csv.py
-$ /venv/bin/python3 src/bloom/tasks/load_dim_zone_amp_from_csv.py
-$ /venv/bin/python3 src/bloom/tasks/compute_port_geometry_buffer.py
+$ /venv/bin/python3 backend/bloom/tasks/load_dim_vessel_from_csv.py 
+$ /venv/bin/python3 backend/bloom/tasks/load_dim_port_from_csv.py
+$ /venv/bin/python3 backend/bloom/tasks/load_dim_zone_amp_from_csv.py
+$ /venv/bin/python3 backend/bloom/tasks/compute_port_geometry_buffer.py
 ```
 
 - If you feel it, drop old tables:
@@ -208,55 +203,29 @@ DROP TABLE spire_vessel_positions;
 DROP TABLE vessels;
 ```
 
-### Use the Bloom Application
+### Use Trawl Watch
 
-#### Access Web Interface
+Launch backend:
+```bash
+fastapi run backend/bloom/app.py
+```
 
-After having succeed with [With Docker/Docker Compose stack](#with-docker) or [On local machine](#on-local-machine)
-installation and managed to [Load demonstration data](#load-demonstration-data) you should now access the Bloom
-application with you favorite web browser
+Open [http://0.0.0.0:8000/docs#/](http://0.0.0.0:8000/docs#/)
 
-* Access to http://localhost:8501
-  ![Home](docs/images/trawlwatch_home.png)
-* Navigate to "Vessel Exploration"
-* Enter MMSI 261084090 as example
-* Clic on "Load"
-* You can select voyage_id and view track of vessel
-  ![Loaded](docs/images/trawlwatch_loaded_voyage.png)
+Launch frontend:
+```bash
+cd frontend
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
 
 ## Official source code
 
-You cna find official source code on [Github Repository](https://github.com/dataforgoodfr/12_bloom/)
+You can find official source code on [Github Repository](https://github.com/dataforgoodfr/12_bloom/)
 
-## Contributing
-
-Want to help build Bloom Application Check out
-our [contributing documentation](https://github.com/dataforgoodfr/12_bloom/tree/main/docs/contributing/README.md).
-
-Official Docker (container) images for Bloom Application are described
+Official Docker (container) images for Trawl Watch are described
 in [images](https://github.com/dataforgoodfr/12_bloom/tree/main/docker/).
 
-## Who uses Trawl Watch?
-
-## What goes into the next release?
-
-#TODO
-
-## Can I use the Trawl Watch logo in my presentation?
-
-#TODO
-
-## Links
-
-#TODO
-
-## More information can be found there
-
-1. [Database initialisation](./docs/notes/database.initialisation.md)
-2. [Development environment](./docs/notes/development.environment.md) # outdated
-3. [Architecture description](./docs/notes/technical.architecture.md)
-4. [Useful SQL examples](./docs/notes/sql.examples.md)
-
-## FAQ
-
-#todo
+### Who maintains Trawl Watch
+**Marthe Vienne** (marthevienne@bloomassociation.org) is the administrator of Trawl Watch.

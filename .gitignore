@@ -1,13 +1,9 @@
 # APP BLOOM
-
-#.DS_Store
-
-data/*.csv
-data/*.xlsx
+/.marthe/
+/data/
 !/data/README.md
 /secrets/
-
-
+.vscode
 # From https://github.com/github/gitignore/blob/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -147,9 +143,6 @@ venv.bak/
 # Spyder project settings
 .spyderproject
 .spyproject
-
-# VS Code
-.vscode
 
 # Rope project settings
 .ropeproject

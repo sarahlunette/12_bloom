@@ -1,0 +1,58 @@
+-- seed_dim_vessels.sql
+-- This file is used to create a staging table for Vessels.
+{{ config(
+    enabled=true,
+    schema='staging',
+    materialized='view',
+    tags=['seed','dim', 'vessels','historical'],
+    indexes=[
+        {'columns': ['vessel_id'], 'type': 'btree'},
+        {'columns': ['dim_vessel_name'], 'type': 'btree'},
+        {'columns': ['dim_vessel_flag'], 'type': 'btree'},
+        {'columns': ['dim_vessel_imo'], 'type': 'btree'},
+        {'columns': ['dim_vessel_cfr'], 'type': 'btree'},
+        {'columns': ['dim_vessel_call_sign'], 'type': 'btree'},
+        {'columns': ['dim_vessel_external_marking'], 'type': 'btree'},
+        {'columns': ['dim_vessel_loa'], 'type': 'btree'}
+    ]
+) 
+}}
+
+select 
+    id as vessel_id,
+    ship_name as dim_vessel_name,
+    country_iso3 as dim_vessel_flag,
+    imo as dim_vessel_imo,
+    NULL::varchar as dim_vessel_cfr,
+    ircs as dim_vessel_call_sign,
+    external_marking as dim_vessel_external_marking,
+    loa as dim_vessel_loa,
+    {{ switch_date_formats('start_date') }} as dim_vessel_start_date,
+    ({{ switch_date_formats('end_date') }} + interval '1 day' - interval '1 microsecond') as dim_vessel_end_date,
+
+    coalesce(end_date is NULL, FALSE) as tracking_activated,
+    status as dim_vessel_status,
+    source as dim_vessel_source,
+    'HISTORICAL'::varchar as dim_vessel_origin,
+
+    jsonb_build_object(
+        'gear', gear,
+        'ship_type', type,
+        'main_engine_power', main_engine_power,
+        'auxiliary_engine_power', auxiliary_engine_power,
+        'tonnage_gt', tonnage_gt,
+        'other_tonnage' , other_tonnage,
+        'fish_hold_volume', fish_hold_volume,
+        'carrying_capacity', carrying_capacity,
+        'length_class', case when loa < 15 then '< 15 m'
+                        when loa >= 15 and loa < 24 then '[15-24[ m'
+                        when loa >= 24 and loa < 40 then '[24-40[ m'
+                        when loa >= 40 and loa < 60 then '[40-60[ m'
+                        when loa >= 60 and loa < 80 then '[60-80[ m'
+                        when loa >= 80 then '>=80 m'
+                        else NULL end -- dans l'idéal, pas de valeurs NULL ici
+    ) as dim_vessel_details,
+
+    now() as dim_vessel_created_at
+from {{ ref('historical_dim_vessels') }} as historical_vessels  -- A adapter quand la table de référence changera
+order by vessel_id
